@@ -1,47 +1,44 @@
-package app
+package mainmenu
 
-import (
-	tea "github.com/charmbracelet/bubbletea"
-)
+import tea "github.com/charmbracelet/bubbletea"
 
 const (
-	// quit button
+	// quit buttons
 	quitButton    = "ctrl+c"
 	quitButtonVim = "q"
 
-	// up button
+	// up buttons
 	upButton    = "up"
 	upButtonVim = "k"
 
-	// down button
+	// down buttons
 	downButton    = "down"
 	downButtonVim = "j"
 
-	// enter button
+	// enter buttons
 	enterButton    = "enter"
 	enterButtonAlt = " "
 	enterButtonVim = "l"
 )
 
-func (app appImpl) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch msg.String() {
 		case quitButton, quitButtonVim:
-			return app, tea.Quit
+			return m, tea.Quit
 		case upButton, upButtonVim:
-			if app.cursor > 0 {
-				app.cursor--
+			if m.cursor > 0 {
+				m.cursor--
 			}
 		case downButton, downButtonVim:
-			if app.cursor < len(app.menuItems)-1 {
-				app.cursor++
+			if m.cursor < len(m.menuItems)-1 {
+				m.cursor++
 			}
 		case enterButton, enterButtonAlt, enterButtonVim:
-			// todo: реагировать
+			// todo: emit signal
 		}
 	}
 
-	return app, nil
+	return m, nil
 }

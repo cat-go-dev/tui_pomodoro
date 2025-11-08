@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-type Timer interface {
-	Start(ctx context.Context, time time.Duration) <-chan struct{}
-}
-
 type timerImpl struct{}
 
 func NewTimer() *timerImpl {

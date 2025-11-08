@@ -1,31 +1,44 @@
 package app
 
 import (
-	"pomodoro/internal/app/templates"
-	"pomodoro/internal/ports"
+	"context"
+	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
+	mainmenu "pomodoro/internal/app/components/main_menu"
+	timerimpl "pomodoro/internal/timer"
 )
 
-func NewApp() appImpl {
-	app := appImpl{
-		menuItems: startMenuItems,
-		views: getViews(),
-		state: state{
-			duration: defaultDuration,
-		},
-	}
-	app.state.currentView = app.views[commonView]
-
-	return app
+type component interface {
+	Render()
 }
 
-func getViews() views {
-	return map[view]ports.Template{
-		commonView: templates.NewCommonTempate(),
+type components struct {
+	MainMenu component
+}
+
+type timer interface {
+	Start(ctx context.Context, time time.Duration) <-chan struct{}
+}
+
+type app struct {
+	components *components
+	timer      timer
+}
+
+func NewApp() *app {
+	return &app{
+		components: newComponents(),
+		timer:      timerimpl.NewTimer(),
 	}
 }
 
-func (app appImpl) Init() tea.Cmd {
+func newComponents() *components {
+	return &components{
+		MainMenu: mainmenu.NewComponent(),
+	}
+}
+
+func (a *app) Run() error {
+	a.components.MainMenu.Render()
 	return nil
 }
