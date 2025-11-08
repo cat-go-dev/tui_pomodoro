@@ -1,20 +1,23 @@
 package app
 
-import "fmt"
+const (
+	header = "Pomodoro timer\n\n"
+	footer = "\nPress q to quit.\n"
+)
 
-func (m model) View() string {
-	s := "Pomodoro timer\n\n"
+type view string
 
-	for i, choice := range m.menuItems {
-		cursor := " " // no cursor
-		if m.cursor == i {
-			cursor = ">" // cursor!
-		}
+var (
+	commonView   view = "COMMON"
+	durationForm view = "DURATION_FORN"
+)
 
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
-	}
+func (app appImpl) View() string {
+	s := header
 
-	s += "\nPress q to quit.\n"
+	s += app.state.currentView.Render(app)
+
+	s += footer
 
 	return s
 }
