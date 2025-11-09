@@ -1,6 +1,10 @@
 package mainmenu
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"pomodoro/internal/ports"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 const (
 	// quit buttons
@@ -21,7 +25,7 @@ const (
 	enterButtonVim = "l"
 )
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -36,7 +40,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor++
 			}
 		case enterButton, enterButtonAlt, enterButtonVim:
-			// todo: emit signal
+			go func() {
+				m.events <- ports.EventStartTimer
+			}()
 		}
 	}
 

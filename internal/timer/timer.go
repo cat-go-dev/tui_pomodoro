@@ -5,26 +5,33 @@ import (
 	"time"
 )
 
-type timerImpl struct{}
-
-func NewTimer() *timerImpl {
-	return &timerImpl{}
+type timerImpl struct {
+	ch chan struct{}
 }
 
-func (t *timerImpl) Start(ctx context.Context, dur time.Duration) <-chan struct{} {
-	signalCh := make(chan struct{})
+func NewTimer() *timerImpl {
+	return &timerImpl{
+		ch: make(chan struct{}),
+	}
+}
 
+func (t *timerImpl) Start(ctx context.Context, dur time.Duration) {
 	go func() {
-		defer close(signalCh)
-
 		select {
 		case <-time.After(dur):
-			signalCh <- struct{}{}
+			t.ch <- struct{}{}
 			return
 		case <-ctx.Done():
 			return
 		}
 	}()
+}
 
-	return signalCh
+func (t *timerImpl) Done(ctx context.Context) struct{} {
+	select {
+	case v := <-t.ch:
+		return v
+	case <-ctx.Done():
+		return struct{}{}
+	}
 }
