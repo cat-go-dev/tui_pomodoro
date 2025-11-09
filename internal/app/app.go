@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"os/exec"
+	"time"
+
 	mainmenu "pomodoro/internal/app/components/main_menu"
 	"pomodoro/internal/ports"
 	timerimpl "pomodoro/internal/timer"
-	"time"
 )
 
 type components struct {
@@ -45,10 +47,19 @@ func (a *app) startListenToComponentEvents(ctx context.Context) {
 	go func() {
 		for {
 			select {
-			case <-a.components.MainMenu.ListenToEvents():
-				testDuration := time.Second * 5
-				a.commands.StartTimer(ctx, testDuration)
-				a.commands.ListenToTimer(ctx)
+			case event := <-a.components.MainMenu.ListenToEvents():
+				switch event {
+				case ports.EventStartTimer:
+					testDuration := time.Second * 5
+					a.commands.StartTimer(ctx, testDuration)
+					a.commands.ListenToTimer(ctx)
+
+					// sound signal
+					// todo: add sound component
+					exec.Command("afplay", "/System/Library/Sounds/Ping.aiff").Run()
+				case ports.EventStopTimer:
+					//todo: stop timer
+				}
 			case <-ctx.Done():
 				// todo: log this
 				return
